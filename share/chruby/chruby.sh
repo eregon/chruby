@@ -6,6 +6,10 @@ for dir in "$PREFIX/opt/rubies" "$HOME/.rubies"; do
 done
 unset dir
 
+if [[ -n "$TEST_RUBY_DIR" ]]; then
+  RUBIES+=("$TEST_RUBY_DIR")
+fi
+
 function chruby_reset()
 {
 	[[ -z "$RUBY_ROOT" ]] && return

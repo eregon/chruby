@@ -1,0 +1,36 @@
+name: CI
+on: [push, pull_request]
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ ubuntu, macos ]
+    runs-on: ${{ matrix.os }}-latest
+    env:
+      TEST_RUBY_VERSION: 2.6.6
+    steps:
+    - uses: actions/checkout@v2
+    - uses: ruby/setup-ruby@v1
+      id: setup-ruby
+      with:
+        ruby-version: 2.6.6
+        bundler: none
+    - uses: eregon/clean-path@v1
+      with:
+        regexp: '\bruby\b'
+
+    - run: sudo apt-get install shunit2 zsh
+      if: matrix.os == 'ubuntu'
+    - run: brew install shunit2
+      if: matrix.os == 'macos'
+
+    - name: Run tests
+      run: |
+        export SHUNIT2="$(command -v shunit2 2>/dev/null)"
+        echo $SHUNIT2
+        echo $GEM_HOME
+        echo $GEM_PATH
+        mkdir -p test/fixtures/opt/rubies
+        export TEST_RUBY_DIR=${{ steps.setup-ruby.outputs.ruby-prefix }}
+        make test
