@@ -166,11 +166,16 @@ test_ruby_dirname="$test_ruby_engine-$test_ruby_version"
 mkdir -p "$PWD/test/fixtures/opt/rubies"
 cd "$PWD/test/fixtures/opt/rubies"
 
-log "Downloading $test_ruby_url ..."
-download "$test_ruby_url" "$test_ruby_archive" || fail "Download failed"
+if [[ "$GITHUB_ACTIONS" == "true" ]]; then
+	log "Linking $SETUP_RUBY_PREFIX ..."
+	ln -s "$SETUP_RUBY_PREFIX" "$test_ruby_root"
+else
+	log "Downloading $test_ruby_url ..."
+	download "$test_ruby_url" "$test_ruby_archive" || fail "Download failed"
 
-log "Unpacking $test_ruby_archive ..."
-tar -xjf "$test_ruby_archive" || fail "Unpacking failed"
+	log "Unpacking $test_ruby_archive ..."
+	tar -xjf "$test_ruby_archive" || fail "Unpacking failed"
 
-log "Cleaning up ..."
-rm -f "$test_ruby_archive"
+	log "Cleaning up ..."
+	rm -f "$test_ruby_archive"
+fi
